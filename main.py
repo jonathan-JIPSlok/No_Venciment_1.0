@@ -22,17 +22,20 @@ class Widget_Primary(QWidget):#Widget Principal
         NameItem = QLineEdit(self) #Linha para Digitar nome do produto
         self.Layout.addWidget(NameItem, 0, 0, 1, 2)
         
+        CodBarra = QLineEdit(self)
+        self.Layout.addWidget(CodBarra, 0, 2)
+        
         DiaVencimento = QLineEdit(self) #Dia que o produto vence
-        self.Layout.addWidget(DiaVencimento, 0, 2)
+        self.Layout.addWidget(DiaVencimento, 0, 3)
         
         MesVencimento = QLineEdit(self) #mes que o produto vence
-        self.Layout.addWidget(MesVencimento, 0, 3)
+        self.Layout.addWidget(MesVencimento, 0, 4)
         
         AnoVencimento = QLineEdit(self) #Ano que o produto vence
-        self.Layout.addWidget(AnoVencimento, 0, 4)
+        self.Layout.addWidget(AnoVencimento, 0, 5)
         
         CadasterButton = QPushButton('Cadastrar Produto', self)#Botao que Cadastra o Produto
-        self.Layout.addWidget(CadasterButton, 0, 5)
+        self.Layout.addWidget(CadasterButton, 0, 6)
         
 
 if __name__ == '__main__':
