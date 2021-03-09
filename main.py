@@ -5,6 +5,8 @@ import time
 from Design import *
 from Functions import *
 
+SQDB()
+
 class Primary_Windows(QMainWindow): # Janela Princial contera todos os QWidget com seus widgets
     def __init__(self):
         super().__init__()
@@ -19,24 +21,30 @@ class Widget_Primary(QWidget):#Widget Principal
         
         self.Layout = QGridLayout(self)
         
-        NameItem = QLineEdit(self) #Linha para Digitar nome do produto
-        self.Layout.addWidget(NameItem, 0, 0, 1, 2)
+        self.NameItem = QLineEdit(self) #Linha para Digitar nome do produto
+        self.Layout.addWidget(self.NameItem, 0, 0, 1, 2)
         
-        CodBarra = QLineEdit(self)
-        self.Layout.addWidget(CodBarra, 0, 2)
+        self.CodBarra = QLineEdit(self)
+        self.Layout.addWidget(self.CodBarra, 0, 2)
         
-        DiaVencimento = QLineEdit(self) #Dia que o produto vence
-        self.Layout.addWidget(DiaVencimento, 0, 3)
+        self.DiaVencimento = QLineEdit(self) #Dia que o produto vence
+        self.Layout.addWidget(self.DiaVencimento, 0, 3)
         
-        MesVencimento = QLineEdit(self) #mes que o produto vence
-        self.Layout.addWidget(MesVencimento, 0, 4)
+        self.MesVencimento = QLineEdit(self) #mes que o produto vence
+        self.Layout.addWidget(self.MesVencimento, 0, 4)
         
-        AnoVencimento = QLineEdit(self) #Ano que o produto vence
-        self.Layout.addWidget(AnoVencimento, 0, 5)
+        self.AnoVencimento = QLineEdit(self) #Ano que o produto vence
+        self.Layout.addWidget(self.AnoVencimento, 0, 5)
         
-        CadasterButton = QPushButton('Cadastrar Produto', self)#Botao que Cadastra o Produto
-        self.Layout.addWidget(CadasterButton, 0, 6)
-        
+        self.CadasterButton = QPushButton('Cadastrar Produto', self)#Botao que Cadastra o Produto
+        self.Layout.addWidget(self.CadasterButton, 0, 6)
+        self.CadasterButton.clicked.connect(self.CadButton_Func)
+    
+    def CadButton_Func(self):#Funcao efetuada apos clicar botao de cadastro, faz verificacao depois cadastra Item
+        Data = (self.DiaVencimento.text(), self.MesVencimento.text(), self.AnoVencimento.text())
+        if Data[0].isnumeric() and Data[1].isnumeric() and Data[2].isnumeric():
+            if self.NameItem.text() != '' and self.NameItem.text() != ' ':
+                SQDB.InsertItem(self.CodBarra.text(), self.NameItem.text(), Data)
 
 if __name__ == '__main__':
     App = QApplication(sys.argv)
