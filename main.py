@@ -44,7 +44,8 @@ class Widget_Primary(QWidget):#Widget Principal
         Data = (self.DiaVencimento.text(), self.MesVencimento.text(), self.AnoVencimento.text())
         if Data[0].isnumeric() and Data[1].isnumeric() and Data[2].isnumeric():
             if self.NameItem.text() != '' and self.NameItem.text() != ' ':
-                SQDB.InsertItem(self.CodBarra.text(), self.NameItem.text(), Data)
+                Data = f'{Data[0]}.{Data[1]}.{Data[2]}'
+                SQDB().InsertItem(self.CodBarra.text(), self.NameItem.text(), Data)
 
 if __name__ == '__main__':
     App = QApplication(sys.argv)
