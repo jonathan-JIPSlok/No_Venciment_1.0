@@ -1,4 +1,5 @@
 import sqlite3
+from pathlib import Path
 
 class SQDB(): #Funcoes com o banco de dados
     def __init__(self):
