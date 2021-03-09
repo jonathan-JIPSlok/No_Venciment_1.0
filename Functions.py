@@ -18,9 +18,10 @@ class SQDB(): #Funcoes com o banco de dados
         
         self.CreateTables()
     
-    def CreateTables(self):
+    def CreateTables(self): #Cria a tabela no banco de dados caso ela nao exista
         self.cursor.execute('CREATE TABLE IF NOT EXISTS Items(Codigo interger primary key, Codigo_Barras interger, Nome text, Data_Vencimento text)')
     
-    def InsertItem(self, CodBarra, Nome, Data_Vencimento):
-        self.cursor.execute('INSERT INTO Item(Codigo, Codigo_Barras, Nome, Data_Vencimento) VALUES(?, ?, ?, ?)', (randint(11111, 99999), int(CodBarra), Nome, Data_Vencimento))
-        self.connection.commit()
+    def InsertItem(self, CodBarra, Nome, Data_Vencimento): #Insere um elemento no banco de dados
+        self.cursor.execute('INSERT INTO Items(Codigo, Codigo_Barras, Nome, Data_Vencimento) VALUES(?, ?, ?, ?)', (randint(11111, 99999), (int(CodBarra) if CodBarra.isnumeric() else randint(111, 999)), Nome, Data_Vencimento))
+        #self.connection.commit()
+        self.connection.close()
