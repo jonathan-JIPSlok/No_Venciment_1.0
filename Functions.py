@@ -24,4 +24,7 @@ class SQDB(): #Funcoes com o banco de dados
     def InsertItem(self, CodBarra, Nome, Data_Vencimento): #Insere um elemento no banco de dados
         self.cursor.execute('INSERT INTO Items(Codigo, Codigo_Barras, Nome, Data_Vencimento) VALUES(?, ?, ?, ?)', (randint(11111, 99999), (int(CodBarra) if CodBarra.isnumeric() else randint(111, 999)), Nome, Data_Vencimento))
         #self.connection.commit()
+        self.Close()
+
+    def Close(self):
         self.connection.close()
