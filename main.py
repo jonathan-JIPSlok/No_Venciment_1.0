@@ -40,6 +40,7 @@ class Widget_Primary(QWidget):#Widget Principal
         self.Layout.addWidget(self.TabItems)
         self.TabItems.addTab(WindowConfigs(), "Configurações")
         self.TabItems.addTab(Window_CadasterItems(), 'Cadastro')
+        self.TabItems.addTab(Lista_Items(), "Lista")
 
 class WindowConfigs(QWidget):
     def __init__(self):
@@ -111,6 +112,11 @@ class Window_CadasterItems(QWidget):
             if self.NameItem.text() != '' and self.NameItem.text() != ' ':
                 Data = f'{Data[0]}.{Data[1]}.{Data[2]}'
                 SQDB().InsertItem(self.CodBarra.text(), self.NameItem.text(), Data)
+
+class Lista_Items(QWidget): #tabela com todos os items cadastrados no sistema
+    def __init__(self):
+        super().__init__()
+
 
 if __name__ == '__main__':
     App = QApplication(sys.argv)
