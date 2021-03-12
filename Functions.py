@@ -28,3 +28,10 @@ class SQDB(): #Funcoes com o banco de dados
 
     def Close(self):
         self.connection.close()
+
+    def getItems(self, Type = "Geral"):
+        if Type == "Geral":
+            Data = self.cursor.execute("SELECT * FROM Items")
+            Data = Data.fetchall()
+            self.connection.close()
+            return Data

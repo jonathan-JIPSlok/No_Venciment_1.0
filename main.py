@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QLabel, QLineEdit, QGridLayout, QTabWidget, QComboBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QLabel, QLineEdit, QGridLayout, QTabWidget, QComboBox, QTableWidget, QTableWidgetItem
 import sqlite3
 import sys
 import time
@@ -25,7 +25,8 @@ class Primary_Windows(QMainWindow): # Janela Princial contera todos os QWidget c
     def __init__(self):
         super().__init__()
         
-        self.setCentralWidget(Widget_Primary())
+        self.WidgetPrincipal = Widget_Primary()
+        self.setCentralWidget(self.WidgetPrincipal)
         self.setGeometry(0, 0, Display[0], Display[1])
         
         self.show()
@@ -35,12 +36,13 @@ class Widget_Primary(QWidget):#Widget Principal
         super().__init__()
         
         self.Layout = QGridLayout(self)
+        self.Lista_ItemsTot = Tabelas()
         
         self.TabItems = QTabWidget(self)
         self.Layout.addWidget(self.TabItems)
         self.TabItems.addTab(WindowConfigs(), "Configurações")
         self.TabItems.addTab(Window_CadasterItems(), 'Cadastro')
-        self.TabItems.addTab(Lista_Items(), "Lista")
+        self.TabItems.addTab(self.Lista_ItemsTot, "Lista")
 
 class WindowConfigs(QWidget):
     def __init__(self):
@@ -112,11 +114,63 @@ class Window_CadasterItems(QWidget):
             if self.NameItem.text() != '' and self.NameItem.text() != ' ':
                 Data = f'{Data[0]}.{Data[1]}.{Data[2]}'
                 SQDB().InsertItem(self.CodBarra.text(), self.NameItem.text(), Data)
+                self.CodBarra.setText('')
+                self.NameItem.setText("")
+                self.DiaVencimento.setText('')
+                self.MesVencimento.setText("")
+                self.AnoVencimento.setText("")
+                Janela.WidgetPrincipal.Lista_ItemsTot.ResetTable()
 
-class Lista_Items(QWidget): #tabela com todos os items cadastrados no sistema
-    def __init__(self):
+class Tabelas(QWidget): #tabela com todos os items cadastrados no sistema
+    def __init__(self, Type = 'Geral'):
         super().__init__()
+        self.Type = Type
+        self.Layout = QGridLayout(self)#Layout da tela
 
+        self.Tabela = QTableWidget()#tabela
+        self.Layout.addWidget(self.Tabela)
+
+        self.Tabela.setColumnCount(4)
+        self.AddRow()
+
+        self.Tabela.show()
+
+    def AddRow(self):
+        Data = SQDB().getItems(self.Type)
+        self.ItemsObject = []
+        ItemAtual = {}
+        itemCount = 0
+        listaCount = 0
+
+        for lista in Data: #Cada lista detro de Data
+            self.Tabela.insertRow(self.Tabela.rowCount()) #Adiciona uma nova linha
+            for item in lista: #Cada item dentro da lista
+                Objeto = QTableWidgetItem(str(item)) #Objeto do item
+                ItemAtual[item] = Objeto #Adiciona o objeto a uma lista para ser uzado mais tarde
+                self.Tabela.setItem(self.Tabela.rowCount() - 1, itemCount, Objeto) #insere os items a tabela
+
+                itemCount += 1
+            itemCount = 0
+            self.ItemsObject.append(ItemAtual)
+            ItemAtual = {}
+            listaCount += 1
+
+        self.Tabela.cellDoubleClicked.connect(lambda : self.VerifiSelected(self.ItemsObject))
+
+    def ResetTable(self): #Reseta a tabela
+        while self.Tabela.rowCount() > 0:           
+            self.Tabela.removeRow(self.Tabela.rowCount() - 1)
+        self.AddRow()
+
+    def VerifiSelected(self, Data):
+        for Item in Data: #pega cada item (key e value)
+            for items in Item.values(): #Pega apenas o Objeto
+                print(items)
+                try:
+                    if items.isSelected() == True: #Verifica se o Objeto foi selecionado
+                        Data = Item.keys() #Obtem os dados da linha na qual o Usuario selecionou
+                        
+                except RuntimeError: pass
 
 if __name__ == '__main__':
     App = QApplication(sys.argv)
