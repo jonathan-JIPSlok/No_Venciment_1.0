@@ -37,12 +37,54 @@ class Widget_Primary(QWidget):#Widget Principal
         
         self.Layout = QGridLayout(self)
         self.Lista_ItemsTot = Tabelas()
+        self.Lista_PertoVencimento = Tabelas(Type = 'Perto')
+        self.Lista_Vencidos = Tabelas(Type = 'Vencido')
+        self.Informacoes = Window_Informations([self.Lista_ItemsTot, self.Lista_PertoVencimento, self.Lista_Vencidos])
         
         self.TabItems = QTabWidget(self)
         self.Layout.addWidget(self.TabItems)
-        self.TabItems.addTab(WindowConfigs(), "Configurações")
+        
+        self.TabItems.addTab(self.Informacoes, "Informações")
         self.TabItems.addTab(Window_CadasterItems(), 'Cadastro')
         self.TabItems.addTab(self.Lista_ItemsTot, "Lista")
+        self.TabItems.addTab(self.Lista_PertoVencimento, "Perto do Vencimento")
+        self.TabItems.addTab(self.Lista_Vencidos, "Items Vencidos")
+        self.TabItems.addTab(WindowConfigs(), "Configurações")
+
+class Window_Informations(QWidget):
+    def __init__(self, Janela):
+        super().__init__()
+        self.Layout = QGridLayout(self)
+        self.Janela = Janela
+        Data = self.ColetinData()
+
+        self.LabelTot = QLabel(Data[0], self)
+        self.LabelPerto = QLabel(Data[1], self)
+        self.LabelVencido = QLabel(Data[2], self)
+
+        TotItems = QLabel('Total de items:', self)
+        self.Layout.addWidget(TotItems,0,0)
+        self.Layout.addWidget(self.LabelTot, 0, 1)
+
+        ItemsPerto_Vencimento = QLabel("Items perto de vencer:", self)
+        self.Layout.addWidget(ItemsPerto_Vencimento, 1,0)
+        self.Layout.addWidget(self.LabelPerto, 1, 1)
+
+        ItemsVencidos = QLabel("Items Vencidos:", self)
+        self.Layout.addWidget(ItemsVencidos, 2, 0)
+        self.Layout.addWidget(self.LabelVencido, 2, 1)
+
+    def ColetinData(self):
+        lista = []
+        lista.append(str(self.Janela[0].RowCountTot))
+        lista.append(str(self.Janela[1].RowCountTot))
+        lista.append(str(self.Janela[2].RowCountTot))
+        return lista
+
+    def Atualizar(self):
+        self.LabelTot.setText(str(self.ColetinData()[0]))
+        self.LabelPerto.setText(str(self.ColetinData()[1]))
+        self.LabelVencido.setText(str(self.ColetinData()[2]))
 
 class WindowConfigs(QWidget):
     def __init__(self):
@@ -52,16 +94,26 @@ class WindowConfigs(QWidget):
 
         self.LabeDisplay_Configure = QLabel("Display", self) #Label de display
         self.LabeDisplay_Configure.setMaximumWidth(50) #Tamanho da label/Widget
+
         self.Display_ConfigureLargura = QLineEdit(str(Display[0]), self) #largura desejada da tela
         self.Display_ConfigureLargura.setMaximumWidth(50)
         self.Display_ConfigureAltura = QLineEdit(str(Display[1]), self) #Altura desejada da tela
         self.Display_ConfigureAltura.setMaximumWidth(50)
+
         self.Layout.addWidget(self.LabeDisplay_Configure, 0, 0)#Adcinionado widgest a tela
         self.Layout.addWidget(self.Display_ConfigureLargura, 0, 1)
         self.Layout.addWidget(self.Display_ConfigureAltura, 0, 2)
 
+        self.ResetButton_Items = QPushButton("Resetar items cadastrados", self) #Reseta o banco de dados
+        self.Layout.addWidget(self.ResetButton_Items, 0, 3)
+        self.ResetButton_Items.clicked.connect(lambda : SQDB().Reset())
+        self.ResetButton_Items.clicked.connect(lambda : Janela.WidgetPrincipal.Lista_ItemsTot.ResetTable())
+        self.ResetButton_Items.clicked.connect(lambda : Janela.WidgetPrincipal.Lista_Vencidos.ResetTable())
+        self.ResetButton_Items.clicked.connect(lambda : Janela.WidgetPrincipal.Lista_PertoVencimento.ResetTable())
+        self.ResetButton_Items.clicked.connect(lambda : Janela.WidgetPrincipal.Informacoes.Atualizar())
+
         self.SaveButton = QPushButton("Salvar", self)
-        self.Layout.addWidget(self.SaveButton, 5, 0, 1, 3)
+        self.Layout.addWidget(self.SaveButton, 5, 0, 1, 4)
         self.SaveButton.clicked.connect(self.SaveConfigs)
 
     def SaveConfigs(self): #Salva as configuracoes no arquivo configs
@@ -119,7 +171,12 @@ class Window_CadasterItems(QWidget):
                 self.DiaVencimento.setText('')
                 self.MesVencimento.setText("")
                 self.AnoVencimento.setText("")
+                #Atualizando Tabela!
                 Janela.WidgetPrincipal.Lista_ItemsTot.ResetTable()
+                Janela.WidgetPrincipal.Lista_Vencidos.ResetTable()
+                Janela.WidgetPrincipal.Lista_PertoVencimento.ResetTable()
+                Janela.WidgetPrincipal.Informacoes.Atualizar()
+                
 
 class Tabelas(QWidget): #tabela com todos os items cadastrados no sistema
     def __init__(self, Type = 'Geral'):
@@ -141,9 +198,11 @@ class Tabelas(QWidget): #tabela com todos os items cadastrados no sistema
         ItemAtual = {}
         itemCount = 0
         listaCount = 0
+        self.RowCountTot = 0
 
         for lista in Data: #Cada lista detro de Data
             self.Tabela.insertRow(self.Tabela.rowCount()) #Adiciona uma nova linha
+            self.RowCountTot += 1
             for item in lista: #Cada item dentro da lista
                 Objeto = QTableWidgetItem(str(item)) #Objeto do item
                 ItemAtual[item] = Objeto #Adiciona o objeto a uma lista para ser uzado mais tarde
@@ -158,19 +217,58 @@ class Tabelas(QWidget): #tabela com todos os items cadastrados no sistema
         self.Tabela.cellDoubleClicked.connect(lambda : self.VerifiSelected(self.ItemsObject))
 
     def ResetTable(self): #Reseta a tabela
-        while self.Tabela.rowCount() > 0:           
+        while self.Tabela.rowCount() > 0:
             self.Tabela.removeRow(self.Tabela.rowCount() - 1)
         self.AddRow()
 
     def VerifiSelected(self, Data):
         for Item in Data: #pega cada item (key e value)
             for items in Item.values(): #Pega apenas o Objeto
-                print(items)
                 try:
                     if items.isSelected() == True: #Verifica se o Objeto foi selecionado
-                        Data = Item.keys() #Obtem os dados da linha na qual o Usuario selecionou
-                        
+                        Key = Item.keys() #Obtem os dados da linha na qual o Usuario selecionou
+                        Data = []
+                        for Dados in Key: #Extraindo Dados Da Key Item
+                            Data.append(Dados)
+                        Janela.setCentralWidget(Window_InformationSelected(Data))
                 except RuntimeError: pass
+
+class Window_InformationSelected(QWidget):
+    def __init__(self, Data):
+        super().__init__()
+
+        self.Layout = QGridLayout(self)
+
+        LabelCodigo = QLabel("Codigo: ", self)
+        self.Layout.addWidget(LabelCodigo,0,0)
+        self.Layout.addWidget(QLabel(str(Data[0]), self), 0, 1)
+
+        LabelBarra = QLabel("Codigo Barra: ", self)
+        self.Layout.addWidget(LabelBarra,1,0)
+        self.Layout.addWidget(QLabel(str(Data[1]), self), 1, 1)
+
+        LabelNome = QLabel("Nome: ", self)
+        self.Layout.addWidget(LabelNome,2,0)
+        self.Layout.addWidget(QLabel(str(Data[2]), self), 2, 1)
+
+        LabelVencimento = QLabel("Vencimento: ", self)
+        self.Layout.addWidget(LabelVencimento,3,0)
+        self.Layout.addWidget(QLabel(str(Data[3]), self), 3, 1)
+
+        voltarButton = QPushButton("Voltar", self)
+        voltarButton.clicked.connect(lambda : self.Voltar())
+        self.Layout.addWidget(voltarButton, 4, 0,1,2)
+
+        DellItems = QPushButton("Deletar", self)
+        self.Layout.addWidget(DellItems, 5, 0, 1, 2)
+        DellItems.clicked.connect(lambda : SQDB().DellItem(Data[0]))
+        DellItems.clicked.connect(lambda : self.Voltar())
+
+        self.show()
+
+    def Voltar(self):
+        Janela.WidgetPrincipal = Widget_Primary()
+        Janela.setCentralWidget(Janela.WidgetPrincipal)
 
 if __name__ == '__main__':
     App = QApplication(sys.argv)
