@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QLa
 import sqlite3
 import sys
 import time
+import Design
 from Design import *
 from Functions import *
 import shelve
@@ -28,6 +29,7 @@ class Primary_Windows(QMainWindow): # Janela Princial contera todos os QWidget c
         self.WidgetPrincipal = Widget_Primary()
         self.setCentralWidget(self.WidgetPrincipal)
         self.setGeometry(0, 0, Display[0], Display[1])
+        self.setStyleSheet(Design.alternativo)
         
         self.show()
 
@@ -146,7 +148,7 @@ class Window_CadasterItems(QWidget):
         
         self.MesVencimento = QLineEdit(self) #mes que o produto vence
         self.Layout.addWidget(self.MesVencimento, 4, 0)
-        self.MesVencimento.setFixedWidth(30)
+        self.MesVencimento.setFixedWidth(35)
         self.MesVencimento.setPlaceholderText("Mês")
         self.MesVencimento.returnPressed.connect(lambda : self.AnoVencimento.setFocus())
         
