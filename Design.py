@@ -1,4 +1,4 @@
-Dakt_Theme = """QMainWindow {
+Dark_Theme = """QMainWindow {
     background-color: rgb(50, 50, 50)
     }
     QWidget {
@@ -29,7 +29,7 @@ Dakt_Theme = """QMainWindow {
         color: rgb(200, 200, 200)
     }
 	QComboBox:hover:!pressed {
-        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(40, 40, 80), stop: 1 rgb(100, 100, 180));
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(50, 50, 50), stop: 1 rgb(200, 200, 200));
         border-style: outset
     }
     QTabBar::tab:Selected {
