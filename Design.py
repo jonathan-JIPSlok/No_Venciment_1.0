@@ -44,8 +44,9 @@ Dark_Theme = """QMainWindow {
     }
     QTableWidget::item:selected {
         color: rgb(0,255,0)
-    }"""
-
+    }
+    """
+    
 Light_Theme = """QMainWindow {
     background-color: rgb(250, 250, 250)
     }

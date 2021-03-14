@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QLabel, QLineEdit, QGridLayout, QTabWidget, QComboBox, QTableWidget, QTableWidgetItem
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QLabel, QLineEdit, QGridLayout, QTabWidget, QComboBox, QTableWidget, QTableWidgetItem, QMessageBox
 import sqlite3
 import sys
 import time
@@ -31,6 +31,7 @@ class Primary_Windows(QMainWindow): # Janela Princial contera todos os QWidget c
         self.setCentralWidget(self.WidgetPrincipal)
         self.setGeometry(0, 0, Display[0], Display[1])
         self.setStyle()
+        self.setWindowTitle("AntiVenciment")
         self.show()
     
     def setStyle(self):
@@ -132,10 +133,17 @@ class WindowConfigs(QWidget):
 
     def SaveConfigs(self): #Salva as configuracoes no arquivo configs
         UserConfigs = shelve.open("Configs")
-        UserConfigs.__setitem__('DisplayGeometry_Largura', self.Display_ConfigureLargura.text())
-        UserConfigs.__setitem__('DisplayGeometry_Altura', self.Display_ConfigureAltura.text())
-        UserConfigs.close()
-        Janela.setGeometry(10,30,int(self.Display_ConfigureLargura.text()), int(self.Display_ConfigureAltura.text()))
+        if self.Display_ConfigureLargura.text().isnumeric() and self.Display_ConfigureAltura.text().isnumeric():
+            UserConfigs.__setitem__('DisplayGeometry_Largura', self.Display_ConfigureLargura.text())
+            UserConfigs.__setitem__('DisplayGeometry_Altura', self.Display_ConfigureAltura.text())
+            UserConfigs.close()
+            Janela.setGeometry(10,30,int(self.Display_ConfigureLargura.text()), int(self.Display_ConfigureAltura.text()))
+        else: 
+            MSG = QMessageBox()
+            MSG.setIcon(QMessageBox.Information)
+            MSG.setWindowTitle("Problema!")
+            MSG.setText("Apenas números no tamanho do Display!")
+            MSG.exec_()
 
     def SetTheme(self):
         UserConfigs = shelve.open("Configs")
@@ -187,7 +195,7 @@ class Window_CadasterItems(QWidget):
 
     def CadButton_Func(self):#Funcao efetuada apos clicar botao de cadastro, faz verificacao depois cadastra Item
         Data = (self.DiaVencimento.text(), self.MesVencimento.text(), self.AnoVencimento.text())
-        if Data[0].isnumeric() and Data[1].isnumeric() and Data[2].isnumeric():
+        if Data[0].isnumeric() and Data[1].isnumeric() and Data[2].isnumeric() and len(Data[0]) == 2 and len(Data[1]) == 2 and len(Data[2]) == 4:
             if self.NameItem.text() != '' and self.NameItem.text() != ' ':
                 Data = f'{Data[0]}.{Data[1]}.{Data[2]}'
                 SQDB().InsertItem(self.CodBarra.text(), self.NameItem.text(), Data)
@@ -201,6 +209,18 @@ class Window_CadasterItems(QWidget):
                 Janela.WidgetPrincipal.Lista_Vencidos.ResetTable()
                 Janela.WidgetPrincipal.Lista_PertoVencimento.ResetTable()
                 Janela.WidgetPrincipal.Informacoes.Atualizar()
+            else:
+                MSG = QMessageBox()
+                MSG.setIcon(QMessageBox.Information)
+                MSG.setWindowTitle("Problema!")
+                MSG.setText("Preencha todos os campos!")
+                MSG.exec_()
+        else:
+            MSG = QMessageBox()
+            MSG.setIcon(QMessageBox.Information)
+            MSG.setWindowTitle("Problema!")
+            MSG.setText("Preencha todos os campos ou verifique a data do item, Deve ser númerico!")
+            MSG.exec_()
                 
 
 class Tabelas(QWidget): #tabela com todos os items cadastrados no sistema
