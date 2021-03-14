@@ -1,0 +1,18 @@
+0000000000000000000000000000000000000000 2da88dbd5dff398c042a7a70b3886b553df5f479 Jonathan Iuri <JonathanPoli17@Gmail.com> 1615224990 -0300	commit (initial): iniciando o projeto
+2da88dbd5dff398c042a7a70b3886b553df5f479 2dbc89271870c962a4ef8c351ba220f5acd96077 Jonathan Iuri <JonathanPoli17@Gmail.com> 1615245172 -0300	commit: Iniciei import
+2dbc89271870c962a4ef8c351ba220f5acd96077 3d9e3c5d2914fa1e1156a19a07badcbbabada173 Jonathan Iuri <JonathanPoli17@Gmail.com> 1615245592 -0300	merge refs/heads/Design: Merge made by recursive.
+3d9e3c5d2914fa1e1156a19a07badcbbabada173 ca1697ce5ce246316e0b32d38dbc19827c835e85 Jonathan Iuri <JonathanPoli17@Gmail.com> 1615245642 -0300	merge refs/heads/Functions: Merge made by recursive.
+ca1697ce5ce246316e0b32d38dbc19827c835e85 1db447fa03f3baeb2ee26fa45f7d4c77a98abd98 Jonathan Iuri <JonathanPoli17@Gmail.com> 1615245679 -0300	commit: 
+1db447fa03f3baeb2ee26fa45f7d4c77a98abd98 51f46c6086f277bb9f6e1882c253a7cefa67a636 Jonathan Iuri <JonathanPoli17@Gmail.com> 1615316013 -0300	commit: Iniciei a janela
+51f46c6086f277bb9f6e1882c253a7cefa67a636 b5005192ca6e5c9a0b532586bf3c94b778911a8e Jonathan Iuri <JonathanPoli17@Gmail.com> 1615328021 -0300	merge refs/heads/InitMain: Fast-forward
+b5005192ca6e5c9a0b532586bf3c94b778911a8e 9e67f85574dc822f1fd4eb1b4bd9d01a5846f9f4 Jonathan Iuri <JonathanPoli17@Gmail.com> 1615328166 -0300	commit: Conflito resolvido
+9e67f85574dc822f1fd4eb1b4bd9d01a5846f9f4 64333d5ae056be89d006cf41a83399e7b11502f0 Jonathan Iuri <JonathanPoli17@Gmail.com> 1615328781 -0300	commit: Configurando a inserção
+64333d5ae056be89d006cf41a83399e7b11502f0 f629e84989cb5aa325f8a381eae498d348f6ed8f Jonathan Iuri <JonathanPoli17@Gmail.com> 1615328798 -0300	commit: Configurando os dados da inserção 
+f629e84989cb5aa325f8a381eae498d348f6ed8f ecb34d7c704f1d20f06ac62c64b8ab88618d7403 Jonathan Iuri <JonathanPoli17@Gmail.com> 1615333875 -0300	commit: 
+ecb34d7c704f1d20f06ac62c64b8ab88618d7403 77bb064d0f5230e88e051f0d158cb320de415611 Jonathan Iuri <JonathanPoli17@Gmail.com> 1615429026 -0300	commit: 
+77bb064d0f5230e88e051f0d158cb320de415611 ad7227b57cec23bf409182192b886d2b94748e3b Jonathan Iuri <JonathanPoli17@Gmail.com> 1615474246 -0300	merge News-Ajusts: Fast-forward
+ad7227b57cec23bf409182192b886d2b94748e3b b7ea3f8d9d5e9242bd8c9fd1e774de696637c307 Jonathan Iuri <JonathanPoli17@Gmail.com> 1615474717 -0300	merge News-Ajusts: Fast-forward
+b7ea3f8d9d5e9242bd8c9fd1e774de696637c307 151637d1209dce50794346b4fe3783f093feda11 Jonathan Iuri <JonathanPoli17@Gmail.com> 1615475103 -0300	commit: Novo design, Configurações de tamanho de tela funcionando, iniciando tabela.
+151637d1209dce50794346b4fe3783f093feda11 1315741e6ee0dbf461b18c059ec40979b5c35eda Jonathan Iuri <JonathanPoli17@Gmail.com> 1615475321 -0300	commit: 
+1315741e6ee0dbf461b18c059ec40979b5c35eda 0b47b2ab42a57efc08c6cbe9ff6da9767f25aa36 Jonathan Iuri <JonathanPoli17@Gmail.com> 1615547109 -0300	commit: Tabela com todos os itens. emissão de sinal quando receber dois clicks.
+0b47b2ab42a57efc08c6cbe9ff6da9767f25aa36 9649d1100427e996996278841429ccd1c68f8650 Jonathan Iuri <JonathanPoli17@Gmail.com> 1615563587 -0300	merge Main2_Principal: Fast-forward

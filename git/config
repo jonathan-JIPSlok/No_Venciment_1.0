@@ -1,0 +1,17 @@
+[core]
+	symlinks = false
+	repositoryformatversion = 0
+	filemode = false
+	logallrefupdates = true
+[remote "origin"]
+	url = https://github.com/jonathan-JIPSlok/JProject
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[user]
+	name = Jonathan Iuri
+	email = JonathanPoli17@Gmail.com
+[branch "Funcao_de_Cadastro"]
+	remote = origin
+	merge = refs/heads/Funcao_de_Cadastro
+[branch "InitMain"]
+	remote = origin
+	merge = refs/heads/InitMain

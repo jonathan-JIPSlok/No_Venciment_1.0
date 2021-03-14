@@ -29,7 +29,7 @@ class Primary_Windows(QMainWindow): # Janela Princial contera todos os QWidget c
         self.WidgetPrincipal = Widget_Primary()
         self.setCentralWidget(self.WidgetPrincipal)
         self.setGeometry(0, 0, Display[0], Display[1])
-        self.setStyleSheet(Design.alternativo)
+        self.setStyleSheet(Design.Dakt_Theme)
         
         self.show()
 
