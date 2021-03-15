@@ -1,10 +1,12 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QLabel, QLineEdit, QGridLayout, QTabWidget, QComboBox, QTableWidget, QTableWidgetItem, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QLabel, QLineEdit, QGridLayout, QTabWidget, QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QDateEdit
+from PyQt5.QtCore import QDateTime
 import sqlite3
 import sys
 import time
 import Design
 from Design import *
 from Functions import *
+from datetime import date
 import shelve
 
 UserConfigs = shelve.open("Configs")
@@ -162,66 +164,46 @@ class Window_CadasterItems(QWidget):
         self.Layout = QGridLayout(self)
 
         self.NameItem = QLineEdit(self) #Linha para Digitar nome do produto
-        self.Layout.addWidget(self.NameItem, 1, 0)
+        self.Layout.addWidget(self.NameItem, 1, 0, 1, 2)
         self.NameItem.setPlaceholderText('Nome Item')
         self.NameItem.returnPressed.connect(lambda : self.CodBarra.setFocus())
         
         self.CodBarra = QLineEdit(self)
-        self.Layout.addWidget(self.CodBarra, 2, 0)
+        self.Layout.addWidget(self.CodBarra, 2, 0, 1, 2)
         self.CodBarra.setPlaceholderText("Codigo Barra")
-        self.CodBarra.returnPressed.connect(lambda : self.DiaVencimento.setFocus())
-        
-        self.DiaVencimento = QLineEdit(self) #Dia que o produto vence
-        self.Layout.addWidget(self.DiaVencimento, 3, 0)
-        self.DiaVencimento.setFixedWidth(35)
-        self.DiaVencimento.setPlaceholderText("Dia")
-        self.DiaVencimento.returnPressed.connect(lambda : self.MesVencimento.setFocus())
-        
-        self.MesVencimento = QLineEdit(self) #mes que o produto vence
-        self.Layout.addWidget(self.MesVencimento, 4, 0)
-        self.MesVencimento.setFixedWidth(40)
-        self.MesVencimento.setPlaceholderText("Mês")
-        self.MesVencimento.returnPressed.connect(lambda : self.AnoVencimento.setFocus())
-        
-        self.AnoVencimento = QLineEdit(self) #Ano que o produto vence
-        self.Layout.addWidget(self.AnoVencimento, 5, 0)
-        self.AnoVencimento.setFixedWidth(40)
-        self.AnoVencimento.setPlaceholderText("Ano")
-        self.AnoVencimento.returnPressed.connect(self.CadButton_Func)
+        self.CodBarra.returnPressed.connect(lambda : self.DateVencimento.setFocus())
 
+        self.DateVencimento = QLabel('Vencimento:' ,self) #Dia que o produto vence
+        self.Layout.addWidget(self.DateVencimento, 3, 0, 1, 1)
+        self.DateVencimento.setFixedWidth(100)
+
+        self.Date = QDateEdit()
+        datetimetext = QDateTime(date.today().year, date.today().month, date.today().day, 0, 0)
+        self.Date.setDateTime(datetimetext)
+        self.Layout.addWidget(self.Date, 3, 1, 1, 1)
+        
         self.CadasterButton = QPushButton('Cadastrar Produto', self)#Botao que Cadastra o Produto
-        self.Layout.addWidget(self.CadasterButton, 6, 0)
+        self.Layout.addWidget(self.CadasterButton, 4, 0, 1, 2)
         self.CadasterButton.clicked.connect(self.CadButton_Func)
 
     def CadButton_Func(self):#Funcao efetuada apos clicar botao de cadastro, faz verificacao depois cadastra Item
-        Data = (self.DiaVencimento.text(), self.MesVencimento.text(), self.AnoVencimento.text())
-        if Data[0].isnumeric() and Data[1].isnumeric() and Data[2].isnumeric() and len(Data[0]) == 2 and len(Data[1]) == 2 and len(Data[2]) == 4:
-            if self.NameItem.text() != '' and self.NameItem.text() != ' ':
-                Data = f'{Data[0]}.{Data[1]}.{Data[2]}'
-                SQDB().InsertItem(self.CodBarra.text(), self.NameItem.text(), Data)
-                self.CodBarra.setText('')
-                self.NameItem.setText("")
-                self.DiaVencimento.setText('')
-                self.MesVencimento.setText("")
-                self.AnoVencimento.setText("")
-                #Atualizando Tabela!
-                Janela.WidgetPrincipal.Lista_ItemsTot.ResetTable()
-                Janela.WidgetPrincipal.Lista_Vencidos.ResetTable()
-                Janela.WidgetPrincipal.Lista_PertoVencimento.ResetTable()
-                Janela.WidgetPrincipal.Informacoes.Atualizar()
-            else:
-                MSG = QMessageBox()
-                MSG.setIcon(QMessageBox.Information)
-                MSG.setWindowTitle("Problema!")
-                MSG.setText("Preencha todos os campos!")
-                MSG.exec_()
+        Data = str(self.Date.date().toPyDate())
+        if self.NameItem.text() != '' and self.NameItem.text() != ' ':
+            Data = f'{Data[8:10]}.{Data[5:7]}.{Data[0:4]}'
+            SQDB().InsertItem(self.CodBarra.text(), self.NameItem.text().upper(), Data)
+            self.CodBarra.setText('')
+            self.NameItem.setText("")
+            #Atualizando Tabela!
+            Janela.WidgetPrincipal.Lista_ItemsTot.ResetTable()
+            Janela.WidgetPrincipal.Lista_Vencidos.ResetTable()
+            Janela.WidgetPrincipal.Lista_PertoVencimento.ResetTable()
+            Janela.WidgetPrincipal.Informacoes.Atualizar()
         else:
             MSG = QMessageBox()
             MSG.setIcon(QMessageBox.Information)
             MSG.setWindowTitle("Problema!")
-            MSG.setText("Preencha todos os campos ou verifique a data do item, Deve ser númerico!")
+            MSG.setText("Preencha todos os campos!")
             MSG.exec_()
-                
 
 class Tabelas(QWidget): #tabela com todos os items cadastrados no sistema
     def __init__(self, Type = 'Geral'):
