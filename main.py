@@ -1,10 +1,12 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QLabel, QLineEdit, QGridLayout, QTabWidget, QComboBox, QTableWidget, QTableWidgetItem
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QLabel, QLineEdit, QGridLayout, QTabWidget, QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QDateEdit
+from PyQt5.QtCore import QDateTime
 import sqlite3
 import sys
 import time
 import Design
 from Design import *
 from Functions import *
+from datetime import date
 import shelve
 
 UserConfigs = shelve.open("Configs")
@@ -13,8 +15,9 @@ try: #Configuracoes do programa
     if len(UserConfigs['DisplayGeometry_Largura']) >= 0 and len(UserConfigs['DisplayGeometry_Altura']) >= 0:
         Display = (int(UserConfigs["DisplayGeometry_Largura"]), int(UserConfigs['DisplayGeometry_Altura']))
 except:
-    UserConfigs['DisplayGeometry_Largura'] = "620"
+    UserConfigs['DisplayGeometry_Largura'] = "750"
     UserConfigs['DisplayGeometry_Altura'] = "320"
+    UserConfigs['Thema'] = 'Dark_Theme'
     Display = (int(UserConfigs["DisplayGeometry_Largura"]), int(UserConfigs['DisplayGeometry_Altura']))
 finally:
     UserConfigs.close()
@@ -29,9 +32,16 @@ class Primary_Windows(QMainWindow): # Janela Princial contera todos os QWidget c
         self.WidgetPrincipal = Widget_Primary()
         self.setCentralWidget(self.WidgetPrincipal)
         self.setGeometry(0, 0, Display[0], Display[1])
-        self.setStyleSheet(Design.Dakt_Theme)
-        
+        self.setStyle()
+        self.setWindowTitle("AntiVenciment")
         self.show()
+    
+    def setStyle(self):
+        UserConfigs = shelve.open("Configs")
+        if UserConfigs["Thema"] == 'Dark_Theme':
+            self.setStyleSheet(Design.Dark_Theme)
+        elif UserConfigs["Thema"] == "Light_Theme":
+            self.setStyleSheet(Design.Light_Theme)
 
 class Widget_Primary(QWidget):#Widget Principal 
     def __init__(self):
@@ -95,7 +105,7 @@ class WindowConfigs(QWidget):
         self.Layout = QGridLayout(self)
 
         self.LabeDisplay_Configure = QLabel("Display", self) #Label de display
-        self.LabeDisplay_Configure.setMaximumWidth(50) #Tamanho da label/Widget
+        self.LabeDisplay_Configure.setMaximumWidth(60) #Tamanho da label/Widget
 
         self.Display_ConfigureLargura = QLineEdit(str(Display[0]), self) #largura desejada da tela
         self.Display_ConfigureLargura.setMaximumWidth(50)
@@ -108,11 +118,16 @@ class WindowConfigs(QWidget):
 
         self.ResetButton_Items = QPushButton("Resetar items cadastrados", self) #Reseta o banco de dados
         self.Layout.addWidget(self.ResetButton_Items, 0, 3)
-        self.ResetButton_Items.clicked.connect(lambda : SQDB().Reset())
+        self.ResetButton_Items.clicked.connect(self.Verify_Reset)
         self.ResetButton_Items.clicked.connect(lambda : Janela.WidgetPrincipal.Lista_ItemsTot.ResetTable())
         self.ResetButton_Items.clicked.connect(lambda : Janela.WidgetPrincipal.Lista_Vencidos.ResetTable())
         self.ResetButton_Items.clicked.connect(lambda : Janela.WidgetPrincipal.Lista_PertoVencimento.ResetTable())
         self.ResetButton_Items.clicked.connect(lambda : Janela.WidgetPrincipal.Informacoes.Atualizar())
+
+        self.SetTheme_Button = QComboBox(self)
+        self.SetTheme_Button.addItems(['Dark-Theme', "Light-Theme"])
+        self.SetTheme_Button.activated[str].connect(self.SetTheme)
+        self.Layout.addWidget(self.SetTheme_Button, 1, 0, 1, 3)
 
         self.SaveButton = QPushButton("Salvar", self)
         self.Layout.addWidget(self.SaveButton, 5, 0, 1, 4)
@@ -120,10 +135,34 @@ class WindowConfigs(QWidget):
 
     def SaveConfigs(self): #Salva as configuracoes no arquivo configs
         UserConfigs = shelve.open("Configs")
-        UserConfigs.__setitem__('DisplayGeometry_Largura', self.Display_ConfigureLargura.text())
-        UserConfigs.__setitem__('DisplayGeometry_Altura', self.Display_ConfigureAltura.text())
+        if self.Display_ConfigureLargura.text().isnumeric() and self.Display_ConfigureAltura.text().isnumeric():
+            UserConfigs.__setitem__('DisplayGeometry_Largura', self.Display_ConfigureLargura.text())
+            UserConfigs.__setitem__('DisplayGeometry_Altura', self.Display_ConfigureAltura.text())
+            UserConfigs.close()
+            Janela.setGeometry(10,30,int(self.Display_ConfigureLargura.text()), int(self.Display_ConfigureAltura.text()))
+        else: 
+            MSG = QMessageBox()
+            MSG.setIcon(QMessageBox.Information)
+            MSG.setWindowTitle("Problema!")
+            MSG.setText("Apenas números no tamanho do Display!")
+            MSG.exec_()
+
+    def Verify_Reset(self):
+        MSG = QMessageBox(QMessageBox.Question, "Alerta", "Deseja mesmo Resetar os Dados?", QMessageBox.StandardButton(QMessageBox.Yes | QMessageBox.No))
+        button = MSG.exec_()
+        if button == QMessageBox.Yes:
+            SQDB().Reset()
+    
+    def SetTheme(self):
+        UserConfigs = shelve.open("Configs")
+        if self.SetTheme_Button.currentText() == 'Dark-Theme':
+            UserConfigs.__setitem__("Thema", "Dark_Theme")
+            Janela.setStyleSheet(Design.Dark_Theme)
+        elif self.SetTheme_Button.currentText() == "Light-Theme":
+            UserConfigs.__setitem__("Thema", "Light_Theme")
+            Janela.setStyleSheet(Design.Light_Theme)
         UserConfigs.close()
-        Janela.setGeometry(10,30,int(self.Display_ConfigureLargura.text()), int(self.Display_ConfigureAltura.text()))
+
 class Window_CadasterItems(QWidget):
     def __init__(self):
         super().__init__()
@@ -131,54 +170,46 @@ class Window_CadasterItems(QWidget):
         self.Layout = QGridLayout(self)
 
         self.NameItem = QLineEdit(self) #Linha para Digitar nome do produto
-        self.Layout.addWidget(self.NameItem, 1, 0)
+        self.Layout.addWidget(self.NameItem, 1, 0, 1, 2)
         self.NameItem.setPlaceholderText('Nome Item')
         self.NameItem.returnPressed.connect(lambda : self.CodBarra.setFocus())
         
         self.CodBarra = QLineEdit(self)
-        self.Layout.addWidget(self.CodBarra, 2, 0)
+        self.Layout.addWidget(self.CodBarra, 2, 0, 1, 2)
         self.CodBarra.setPlaceholderText("Codigo Barra")
-        self.CodBarra.returnPressed.connect(lambda : self.DiaVencimento.setFocus())
-        
-        self.DiaVencimento = QLineEdit(self) #Dia que o produto vence
-        self.Layout.addWidget(self.DiaVencimento, 3, 0)
-        self.DiaVencimento.setFixedWidth(30)
-        self.DiaVencimento.setPlaceholderText("Dia")
-        self.DiaVencimento.returnPressed.connect(lambda : self.MesVencimento.setFocus())
-        
-        self.MesVencimento = QLineEdit(self) #mes que o produto vence
-        self.Layout.addWidget(self.MesVencimento, 4, 0)
-        self.MesVencimento.setFixedWidth(35)
-        self.MesVencimento.setPlaceholderText("Mês")
-        self.MesVencimento.returnPressed.connect(lambda : self.AnoVencimento.setFocus())
-        
-        self.AnoVencimento = QLineEdit(self) #Ano que o produto vence
-        self.Layout.addWidget(self.AnoVencimento, 5, 0)
-        self.AnoVencimento.setFixedWidth(40)
-        self.AnoVencimento.setPlaceholderText("Ano")
-        self.AnoVencimento.returnPressed.connect(self.CadButton_Func)
+        self.CodBarra.returnPressed.connect(lambda : self.DateVencimento.setFocus())
 
+        self.DateVencimento = QLabel('Vencimento:' ,self) #Dia que o produto vence
+        self.Layout.addWidget(self.DateVencimento, 3, 0, 1, 1)
+        self.DateVencimento.setFixedWidth(100)
+
+        self.Date = QDateEdit()
+        datetimetext = QDateTime(date.today().year, date.today().month, date.today().day, 0, 0)
+        self.Date.setDateTime(datetimetext)
+        self.Layout.addWidget(self.Date, 3, 1, 1, 1)
+        
         self.CadasterButton = QPushButton('Cadastrar Produto', self)#Botao que Cadastra o Produto
-        self.Layout.addWidget(self.CadasterButton, 6, 0)
+        self.Layout.addWidget(self.CadasterButton, 4, 0, 1, 2)
         self.CadasterButton.clicked.connect(self.CadButton_Func)
 
     def CadButton_Func(self):#Funcao efetuada apos clicar botao de cadastro, faz verificacao depois cadastra Item
-        Data = (self.DiaVencimento.text(), self.MesVencimento.text(), self.AnoVencimento.text())
-        if Data[0].isnumeric() and Data[1].isnumeric() and Data[2].isnumeric():
-            if self.NameItem.text() != '' and self.NameItem.text() != ' ':
-                Data = f'{Data[0]}.{Data[1]}.{Data[2]}'
-                SQDB().InsertItem(self.CodBarra.text(), self.NameItem.text(), Data)
-                self.CodBarra.setText('')
-                self.NameItem.setText("")
-                self.DiaVencimento.setText('')
-                self.MesVencimento.setText("")
-                self.AnoVencimento.setText("")
-                #Atualizando Tabela!
-                Janela.WidgetPrincipal.Lista_ItemsTot.ResetTable()
-                Janela.WidgetPrincipal.Lista_Vencidos.ResetTable()
-                Janela.WidgetPrincipal.Lista_PertoVencimento.ResetTable()
-                Janela.WidgetPrincipal.Informacoes.Atualizar()
-                
+        Data = str(self.Date.date().toPyDate())
+        if self.NameItem.text() != '' and self.NameItem.text() != ' ':
+            Data = f'{Data[8:10]}.{Data[5:7]}.{Data[0:4]}'
+            SQDB().InsertItem(self.CodBarra.text(), self.NameItem.text().upper(), Data)
+            self.CodBarra.setText('')
+            self.NameItem.setText("")
+            #Atualizando Tabela!
+            Janela.WidgetPrincipal.Lista_ItemsTot.ResetTable()
+            Janela.WidgetPrincipal.Lista_Vencidos.ResetTable()
+            Janela.WidgetPrincipal.Lista_PertoVencimento.ResetTable()
+            Janela.WidgetPrincipal.Informacoes.Atualizar()
+        else:
+            MSG = QMessageBox()
+            MSG.setIcon(QMessageBox.Information)
+            MSG.setWindowTitle("Problema!")
+            MSG.setText("Preencha todos os campos!")
+            MSG.exec_()
 
 class Tabelas(QWidget): #tabela com todos os items cadastrados no sistema
     def __init__(self, Type = 'Geral'):
