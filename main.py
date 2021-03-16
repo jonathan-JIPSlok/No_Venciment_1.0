@@ -118,7 +118,7 @@ class WindowConfigs(QWidget):
 
         self.ResetButton_Items = QPushButton("Resetar items cadastrados", self) #Reseta o banco de dados
         self.Layout.addWidget(self.ResetButton_Items, 0, 3)
-        self.ResetButton_Items.clicked.connect(lambda : SQDB().Reset())
+        self.ResetButton_Items.clicked.connect(self.Verify_Reset)
         self.ResetButton_Items.clicked.connect(lambda : Janela.WidgetPrincipal.Lista_ItemsTot.ResetTable())
         self.ResetButton_Items.clicked.connect(lambda : Janela.WidgetPrincipal.Lista_Vencidos.ResetTable())
         self.ResetButton_Items.clicked.connect(lambda : Janela.WidgetPrincipal.Lista_PertoVencimento.ResetTable())
@@ -147,6 +147,12 @@ class WindowConfigs(QWidget):
             MSG.setText("Apenas números no tamanho do Display!")
             MSG.exec_()
 
+    def Verify_Reset(self):
+        MSG = QMessageBox(QMessageBox.Question, "Alerta", "Deseja mesmo Resetar os Dados?", QMessageBox.StandardButton(QMessageBox.Yes | QMessageBox.No))
+        button = MSG.exec_()
+        if button == QMessageBox.Yes:
+            SQDB().Reset()
+    
     def SetTheme(self):
         UserConfigs = shelve.open("Configs")
         if self.SetTheme_Button.currentText() == 'Dark-Theme':
